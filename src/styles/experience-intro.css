@@ -1,0 +1,148 @@
+/* ---- Experience Intro ----
+   Cinematic, user-controlled opening frame — NOT a loading screen. An opaque
+   parchment cover with a warm atmospheric gradient; AADI brand, editorial
+   invitation, and a real ENTER button. The ONLY way to leave is ENTER — no
+   timers, no auto-dismiss. On click the shared ambient audio + the Hero video
+   begin together, then the cover dissolves (~1000ms; the typography recedes
+   first) and unmounts via transitionend. Reduced motion collapses all of this
+   via base.css — the intro stays fully functional. */
+
+.experience-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  color: var(--charcoal);
+  --intro-title-size: clamp(2.25rem, 5vw, 4.5rem);
+  background:
+    radial-gradient(
+      120% 90% at 50% 30%,
+      rgba(255, 250, 241, 0.95) 0%,
+      rgba(232, 213, 181, 0.72) 55%,
+      rgba(226, 205, 171, 0) 100%
+    ),
+    var(--parchment);
+  transition: opacity 1000ms var(--ease-out);
+}
+
+.experience-intro[data-phase="leaving"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.experience-intro__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 34rem;
+  padding: var(--space-6) var(--pad-x);
+  text-align: center;
+  transition: opacity 650ms var(--ease-out), transform 650ms var(--ease-out);
+}
+
+/* Typography recedes gently before the cover dissolves. */
+.experience-intro[data-phase="leaving"] .experience-intro__content {
+  opacity: 0;
+  transform: translateY(-14px);
+}
+
+.experience-intro__aadi {
+  margin: 0;
+  font-weight: 300;
+  font-size: var(--intro-title-size);
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  color: var(--charcoal);
+}
+
+/* The sumi-e brush reads at the scale of the brand: it spans roughly 3.5x
+   the AADI title height (i.e. about the width of the word itself). The raw
+   asset is a wide canvas with the ink band only in its vertical middle, so
+   `object-view-box` crops that inked band (alpha bounds x 46..1505, y
+   394..650) and lets the stroke fill the width instead of floating inside
+   empty margins. The ink is baked near-black (avg RGB 33,31,29); it renders
+   at full opacity so it reads black on the parchment. */
+.experience-intro__stroke {
+  display: block;
+  margin-top: var(--space-4);
+  width: clamp(7.875rem, 17.5vw, 15.75rem);
+  aspect-ratio: 1460 / 257;
+  object-fit: cover;
+  object-position: center;
+  object-view-box: inset(38.5% 2% 36.4% 3%);
+}
+
+@supports not (object-view-box: inset(0)) {
+  /* Legacy browsers: never show the raw uncropped canvas (object-fit: cover
+     would eat the stroke's edges). Fall back to the restrained previous
+     rendering instead. */
+  .experience-intro__stroke {
+    width: 128px;
+    height: 10px;
+    aspect-ratio: auto;
+    object-fit: contain;
+    object-view-box: none;
+  }
+}
+
+.experience-intro__quote {
+  margin: var(--space-4) 0 0;
+  max-width: 30rem;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.125rem, 1.8vw, 1.5rem);
+  line-height: var(--lh-display);
+  color: var(--charcoal-soft);
+}
+
+/* Editorial invitation — a real button, not a UI call-to-action. Restrained:
+   uppercase label + a short line that expands toward crimson on hover/focus. */
+.experience-intro__enter {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  min-height: 44px;
+  padding: var(--space-1) var(--space-3);
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  letter-spacing: 0.35em;
+  text-indent: 0.35em;
+  text-transform: uppercase;
+  color: var(--charcoal);
+  transition: color 300ms var(--ease-out);
+}
+
+.experience-intro__enter-line {
+  width: 24px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(1);
+  transform-origin: center;
+  transition: transform 300ms var(--ease-out),
+    background-color 300ms var(--ease-out);
+}
+
+.experience-intro__enter:hover,
+.experience-intro__enter:focus-visible {
+  color: var(--crimson);
+}
+
+.experience-intro__enter:hover .experience-intro__enter-line,
+.experience-intro__enter:focus-visible .experience-intro__enter-line {
+  transform: scaleX(1.9);
+}
+
+/* Short viewports: compact the vertical air so the composition fits without
+   scrolling on landscape phones / small laptops. */
+@media (max-height: 560px) {
+  .experience-intro__content {
+    padding-block: var(--space-4);
+  }
+}

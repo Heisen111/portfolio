@@ -1,0 +1,21 @@
+node_modules
+dist
+coverage
+*.local
+.DS_Store
+Thumbs.db
+*.log
+*.tsbuildinfo
+.vscode/
+.idea/
+.vercel/
+
+# Secrets — never commit environment variables
+.env
+.env.*
+!.env.example
+
+# Internal OpenCode/development docs — keep local, never commit
+AGENTS.md
+PROJECT_CONTEXT.md
+docs/

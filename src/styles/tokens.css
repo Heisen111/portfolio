@@ -1,0 +1,81 @@
+/**
+ * Design tokens. Single source of truth for visual values.
+ * Colors verified against the approved artwork (see docs/DESIGN_SYSTEM.md §Color).
+ */
+:root {
+  color-scheme: dark;
+
+  /* ---- Color (locked direction; verified against artwork) ---- */
+  --parchment: #e8d5b5;
+  --parchment-light: #f1e4cc;
+  --charcoal: #171614;
+  --charcoal-soft: #292723;
+  --crimson: #a32b30;
+  --crimson-dark: #68181c;
+  /* Crimson that clears WCAG on the dark hero (~4.7:1 on #171614) — used
+     only where crimson text must stay readable over artwork (the hero's
+     Japanese quote). Accents/links on parchment keep --crimson. */
+  --crimson-bright: #d45a61;
+  --mist: rgba(232, 213, 181, 0.65);
+  --white-warm: #f5ebdd;
+
+  /* Supporting-text hierarchy (readability over cinematic artwork).
+     Warmer, lighter ivory tones — dimmer than --parchment/--parchment-light
+     so main headings stay dominant; never pure white, never crimson. */
+  --parchment-soft: #ddd2bf; /* subtitles / secondary lead (italic leads) */
+  --parchment-support: #d8cdb8; /* body / supporting description */
+
+  /* Ultra-subtle text shadow for supporting text against busy artwork.
+     Legibility only — never a glow. No panels/boxes/overlays. */
+  --support-text-shadow: 0 1px 8px rgba(25, 20, 15, 0.22);
+
+  /* Derived: parchment sampled from the approved artwork (median across sections,
+     ~#C6A683–#D0AF85). For background scrims/tints only — never for text
+     (text uses --parchment, which is intentionally brighter for contrast). */
+  --art-parchment: #ceaf8a;
+
+  /* ---- Typography ---- */
+  /* Noto Serif JP sits in the fallback chain of display/ui stacks so Japanese
+     glyphs always render through the self-hosted JP family. */
+  --font-display: "Cormorant Garamond", "Noto Serif JP", "Yu Mincho", serif;
+  --font-jp: "Noto Serif JP", "Yu Mincho", "Hiragino Mincho ProN", serif;
+  --font-ui: "Inter", "Noto Serif JP", system-ui, -apple-system, sans-serif;
+
+  /* Responsive scale (desktop targets: hero 72–96, section 64–88,
+     project 48–64, body 18–20, ui 11–14). Floors keep mobile legible. */
+  --text-hero: clamp(2.5rem, 6vw, 6rem); /* 40 / ~72@1200 / 96@1600+ */
+  --text-section: clamp(2rem, calc(6vw - 0.5rem), 5.5rem); /* 32 / 64@1200 / 88@1600+ */
+  --text-project: clamp(1.875rem, 4vw, 4rem); /* 30 / 48@1200 / 64@1600+ */
+  --text-body: clamp(1.125rem, 0.75rem + 0.5vw, 1.25rem); /* 18 / ~19@1200 / 20@1600+ */
+  --text-ui: clamp(0.6875rem, 0.5rem + 0.4vw, 0.875rem); /* 11 / ~13@1200 / 14@1600+ */
+
+  --tracking-display: -0.01em;
+  --tracking-ui: 0.12em;
+  --lh-display: 1.05;
+  --lh-body: 1.6;
+  --lh-ui: 1.4;
+
+  /* ---- Spacing scale ---- */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+  --space-7: 96px;
+  --space-8: 128px;
+
+  /* ---- Layout ---- */
+  --pad-x: clamp(24px, 6vw, 96px);
+  --max-width: 1280px;
+
+  /* ---- Motion ---- */
+  --dur-fast: 300ms;
+  --dur-med: 500ms;
+  --dur-slow: 650ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ---- Background focus / blur treatment ---- */
+  --bg-focus-opacity: 0.4;
+  --bg-focus-blur: 4px;
+}

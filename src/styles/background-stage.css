@@ -1,0 +1,73 @@
+/* ---- Shared cinematic background compositor ----
+   One fixed layer behind all content. Artwork never lives inside the
+   sections anymore, so section boundaries can't show wallpaper seams.
+   z-index -1: paints above the page charcoal but below every section,
+   scrim, nav, intro, and the hero's own media stack — non-positioned
+   content always paints above negative z-index, so nothing needs
+   repositioning. */
+
+.background-stage {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.background-stage img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Focal positioning for each artwork lives in `--art-focus` (defaults to
+     center — the pixel-safe choice on any crop). Tune per chapter in one
+     place when subject coordinates become available; never bake focus into
+     the locked art. */
+  object-position: var(--art-focus, 50% 50%);
+}
+
+/*
+ * Crossfade envelope (~850ms, cinematic ease-out — quiet, not a slideshow):
+ * the current (incoming) artwork fades in while settling very slightly from
+ * scale 1.015 → 1 (a whisper of movement, never a zoom); the prev (outgoing)
+ * layer just fades out with a stable transform. Elements are keyed per
+ * transition so the one-shots replay on every chapter change and settle to a
+ * crisp static artwork — no ongoing motion, no pop-in, no obvious swap.
+ */
+.background-stage__current {
+  animation: background-stage-in 850ms var(--ease-out) both;
+}
+
+.background-stage__prev {
+  animation: background-stage-out 850ms var(--ease-out) both;
+}
+
+@keyframes background-stage-in {
+  from {
+    opacity: 0;
+    transform: scale(1.015);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes background-stage-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/*
+ * Under the compositor the page canvas is parchment (base.css), so there is
+ * always a light parchment/art ground — during the initial fade-in, the
+ * crossfade overlap, or an image still decoding — and never a black or
+ * white gap, image boundary, or horizontal seam.
+ */
+
+/* Reduced motion: base.css collapses animation durations globally; the
+   keyed one-shots resolve instantly to their final (correct) states. */

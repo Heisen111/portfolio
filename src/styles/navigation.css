@@ -1,0 +1,295 @@
+/* ---- Navigation (floating, minimal, never dominates the artwork) ----
+   The AADI brand and the current chapter name follow the ACTIVE section's
+   color theme (same source as the section typography): dark artwork uses
+   warm ivory chrome, parchment artwork uses charcoal chrome. The crimson
+   chapter numeral stays crimson in both. */
+
+main section[id] {
+  scroll-margin-top: 64px;
+}
+
+.nav {
+  --nav-text: var(--white-warm);
+  --nav-menu-border: rgba(232, 213, 181, 0.35);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--pad-x);
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+  color: var(--nav-text);
+  transition: color var(--dur-med) var(--ease-out);
+}
+
+.nav--dark {
+  --nav-text: var(--white-warm);
+  --nav-menu-border: rgba(232, 213, 181, 0.35);
+}
+
+.nav--light {
+  --nav-text: var(--charcoal);
+  --nav-menu-border: rgba(23, 22, 20, 0.3);
+}
+
+.nav__brand {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: calc(var(--text-ui) * 1.8);
+  letter-spacing: var(--tracking-display);
+  text-transform: none;
+  color: var(--nav-text);
+  padding: var(--space-1) 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  transition: color var(--dur-med) var(--ease-out);
+}
+
+/* Right-side cluster (chapter indicator + MENU + music control) so the
+   music button never collides with AADI on any breakpoint. */
+.nav__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.nav__indicator {
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding: var(--space-1) 0;
+  min-height: 44px;
+  justify-content: center;
+  color: var(--nav-text);
+  transition: color var(--dur-med) var(--ease-out);
+}
+
+.nav__indicator-index {
+  color: var(--crimson);
+}
+
+.nav__indicator-label {
+  color: var(--nav-text);
+}
+
+.nav__menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--nav-menu-border);
+  color: var(--nav-text);
+}
+
+/* ---- Ambient music control ----
+   One understated play/pause toggle, colored by the same nav theme as AADI
+   and the current chapter name (dark art → warm ivory, parchment art →
+   charcoal). A single 4px crimson dot is the only active-state indicator —
+   no panel, no label, no progress, no volume. Static under reduced motion
+   (base.css collapses the opacity transition). */
+.nav__music {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: var(--space-1);
+  color: var(--nav-text);
+  transition: color var(--dur-med) var(--ease-out);
+}
+
+.nav__music-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+  fill: currentColor;
+}
+
+.nav__music::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--crimson);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.nav__music--playing::after {
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .nav__actions {
+    gap: var(--space-1);
+  }
+
+  /* Slightly smaller on tight screens — never redesigned. */
+  .nav__music {
+    min-width: 40px;
+  }
+
+  .nav__music-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Compact navigation on the narrowest phones: less chrome, same targets. */
+@media (max-width: 400px) {
+  .nav {
+    padding-inline: max(16px, 4vw);
+  }
+
+  .nav__menu-btn,
+  .chapter-menu__close {
+    padding-inline: var(--space-2);
+  }
+}
+
+@media (min-width: 960px) {
+  .nav__indicator {
+    display: flex;
+  }
+
+  .nav__menu-btn {
+    display: none;
+  }
+}
+
+/* ---- Chapter menu ---- */
+
+.chapter-menu {
+  color: var(--charcoal);
+}
+
+.chapter-menu[hidden] {
+  display: none;
+}
+
+.chapter-menu__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chapter-menu__item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  color: var(--charcoal);
+}
+
+.chapter-menu__index {
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  letter-spacing: var(--tracking-ui);
+  color: var(--crimson);
+}
+
+.chapter-menu__item[aria-current="true"] .chapter-menu__label {
+  color: var(--crimson);
+}
+
+/* Desktop panel under the indicator */
+
+.chapter-menu--desktop {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: var(--pad-x);
+  min-width: 264px;
+  background: var(--parchment);
+  padding: var(--space-1);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.chapter-menu--desktop .chapter-menu__item:hover {
+  background: rgba(23, 22, 20, 0.07);
+}
+
+/* Mobile full-screen overlay */
+
+.chapter-menu--mobile {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2) var(--pad-x) var(--space-6);
+  background: var(--parchment);
+  /* Short / landscape viewports: the list must stay reachable — natural
+     touch scrolling inside the overlay, no bleed, no bounce chains. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.chapter-menu--mobile[hidden] {
+  display: none;
+}
+
+.chapter-menu__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chapter-menu__brand {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: calc(var(--text-ui) * 1.8);
+  letter-spacing: var(--tracking-display);
+  text-transform: none;
+  color: var(--charcoal);
+}
+
+.chapter-menu__close {
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid rgba(23, 22, 20, 0.35);
+  color: var(--charcoal);
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+}
+
+.chapter-menu--mobile .chapter-menu__list {
+  margin-top: var(--space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Short viewports: less top air so every chapter fits on one scroll pass. */
+@media (max-height: 560px) {
+  .chapter-menu--mobile .chapter-menu__list {
+    margin-top: var(--space-5);
+  }
+}
+
+.chapter-menu--mobile .chapter-menu__item {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--text-project);
+  min-height: 44px;
+}
+
+.chapter-menu--mobile .chapter-menu__item:hover {
+  color: var(--crimson);
+}

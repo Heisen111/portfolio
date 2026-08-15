@@ -1,0 +1,338 @@
+/* ---- 01 — ARRIVAL ---- */
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 var(--pad-x) var(--space-7);
+  overflow: hidden;
+
+  /* Dark art theme — warm ivory typography, same mechanism as the chapters. */
+  --section-text-primary: var(--white-warm);
+  --section-text-secondary: var(--parchment-soft);
+  --section-text-support: var(--parchment-support);
+  --section-text-shadow: var(--support-text-shadow);
+  --section-heading-shadow: none;
+}
+
+/* ---- Media layer (poster + videos) ---- */
+
+.hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  transition: opacity var(--dur-slow) var(--ease-out),
+    filter var(--dur-slow) var(--ease-out);
+}
+
+.hero__poster,
+.hero__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Keep the composition's center of interest (framed by the locked media).
+     On portrait phones the wide frame is cropped hard horizontally toward the
+     center — center is the pixel-safe focal default; bias per-set only when
+     subject coordinates are known. */
+  object-position: center;
+  opacity: 0;
+  transition: opacity var(--dur-med) var(--ease-out);
+}
+
+.hero__poster {
+  opacity: 1;
+}
+
+/* Playback state machine visibility (see HeroMedia.tsx). */
+.hero__media[data-stage="videoA"] .hero__poster,
+.hero__media[data-stage="videoB"] .hero__poster {
+  opacity: 0;
+}
+
+.hero__media[data-stage="videoA"] .hero__video-a {
+  opacity: 1;
+}
+
+.hero__media[data-stage="videoB"] .hero__video-a {
+  opacity: 0;
+}
+
+.hero__media[data-stage="videoB"] .hero__video-b {
+  opacity: 1;
+}
+
+.hero__media[data-stage="failed"] .hero__video {
+  display: none;
+}
+
+/* Quiet background when the hero quote is focused (keyboard parity).
+   Reversible, 650ms, never default. */
+.hero:has(.hero__quote:focus-within) .hero__media {
+  opacity: 0.4;
+  filter: blur(4px);
+}
+
+/* ---- Scrim (readability only, no blur) ---- */
+
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(23, 22, 20, 0.28) 0%,
+    rgba(23, 22, 20, 0) 40%,
+    rgba(23, 22, 20, 0.55) 100%
+  );
+}
+
+/* Small screens: the bottom-weighted hero text sits over a taller crop of
+   the same artwork, so the bottom scrim deepens a touch — legibility only,
+   never a repaint or new overlay of the locked media. */
+@media (max-width: 760px) {
+  .hero__scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(23, 22, 20, 0.32) 0%,
+      rgba(23, 22, 20, 0) 38%,
+      rgba(23, 22, 20, 0.62) 100%
+    );
+  }
+}
+
+/* Short viewports: the decorative scroll cue could collide with the hero
+   text — it is dropped and the extra bottom padding relaxes to match. */
+@media (max-height: 560px) {
+  .hero__scroll {
+    display: none;
+  }
+
+  .hero {
+    padding-bottom: var(--space-6);
+  }
+}
+
+/* ---- Content ---- */
+
+.hero__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ---- Hero identity: professional name + creative alias ----
+   DEVARSHI is the primary professional name; A.K.A. AADI is a much smaller
+   secondary brand line beneath it — a clear hierarchy, never one equal line.
+   The large editorial statement (title + quote) follows below unchanged. */
+.hero__identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.hero__identity-name {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--text-hero);
+  line-height: 1;
+  letter-spacing: var(--tracking-display);
+  margin: 0;
+  color: var(--section-text-primary);
+  text-shadow: var(--section-heading-shadow, none);
+}
+
+.hero__identity-alias {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+  color: var(--section-text-secondary);
+  text-shadow: var(--section-text-shadow);
+}
+
+.hero__title {
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+  color: var(--section-text-secondary);
+  text-shadow: var(--section-text-shadow);
+}
+
+/* ---- Hero quote (English layer + Japanese ink-reveal layer) ----
+   English is the default visible layer. The Japanese layer sits absolutely
+   over the same box. Both languages are curated 3-line compositions in the
+   content layer (src/content/profile.ts) and share the same text box and
+   line rhythm (identical line heights), so the quote reads as ONE
+   composition switching languages. Desktop: useHeroQuoteReveal writes two
+   inline masks from the SAME soft radial gradient — the Japanese is shown
+   inside the cursor region while the English is masked out in exactly that
+   region (replacement, never both readable at once). Touch: one-shot
+   English ↔ Japanese crossfade. Keyboard: :focus-within full replacement. */
+
+.hero__quote {
+  position: relative;
+  margin: var(--space-2) 0 0;
+  max-width: 36em;
+}
+
+/* Curated lines break on the explicit newlines (white-space: pre-line keeps
+   mobile wrapping safe); on desktop the composition must NEVER soft-wrap, so
+   lines break at the curated newlines only. */
+.hero__quote-en,
+.hero__quote-ja {
+  white-space: pre-line;
+}
+
+@media (min-width: 1200px) {
+  .hero__quote-en,
+  .hero__quote-ja {
+    white-space: pre;
+  }
+}
+
+.hero__quote-en {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: var(--text-project);
+  line-height: var(--lh-display);
+  color: var(--section-text-primary);
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+.hero__quote-ja {
+  --ja-scale: 0.62;
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  font-family: var(--font-jp);
+  font-size: calc(var(--text-project) * var(--ja-scale));
+  line-height: calc(var(--lh-display) / var(--ja-scale));
+  writing-mode: horizontal-tb;
+  direction: ltr;
+  color: var(--crimson-bright);
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+/* Keyboard parity: full replacement reveal on focus (no mask, 500ms). */
+.hero__quote:focus-within .hero__quote-ja {
+  transition-duration: var(--dur-med);
+  opacity: 1;
+}
+
+.hero__quote:focus-within .hero__quote-en {
+  transition-duration: var(--dur-med);
+  opacity: 0;
+}
+
+/* Pointer engagement: the masks follow the cursor; fade the layer in
+   quickly (300ms), fade it out slowly (650ms) on leave. */
+.hero__quote--hovered .hero__quote-ja {
+  transition-duration: var(--dur-fast);
+  opacity: 1;
+}
+
+/* Touch devices: ONE restrained English ↔ Japanese crossfade when the
+   quote enters the viewport — delay 900ms, reveal ~900ms, hold ~1000ms,
+   return ~1200ms. Never loops. Hover-capable desktops never run this. */
+@media (hover: none), (pointer: coarse) {
+  .hero__quote--inview .hero__quote-ja {
+    animation: hero-quote-ja-reveal 3100ms ease-in-out 900ms both;
+  }
+
+  .hero__quote--inview .hero__quote-en {
+    animation: hero-quote-en-reveal 3100ms ease-in-out 900ms both;
+  }
+}
+
+@keyframes hero-quote-ja-reveal {
+  0% {
+    opacity: 0;
+  }
+  29% {
+    opacity: 1;
+  }
+  61% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes hero-quote-en-reveal {
+  0% {
+    opacity: 1;
+  }
+  29% {
+    opacity: 0;
+  }
+  61% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---- Scroll cue (decorative) ---- */
+
+.hero__scroll {
+  position: absolute;
+  z-index: 2;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+  color: var(--mist);
+  pointer-events: none;
+}
+
+.hero__scroll-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(var(--mist), rgba(232, 213, 181, 0));
+  animation: hero-scroll-cue 2.4s var(--ease-out) infinite;
+}
+
+@keyframes hero-scroll-cue {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}

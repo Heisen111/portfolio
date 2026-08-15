@@ -1,0 +1,786 @@
+/* ---- Chapters 02–06 shared scaffold (THE PATH, THE CRAFT, ...) ----
+   Content is editorial typography over the shared background compositor.
+   No per-section scrim or wallpaper: the artwork itself provides the
+   atmosphere (PROMPT 8B removed the dark overlay). Entrance reveals hook
+   into the shared transition director: it sets `data-reveal="down" | "up"`
+   on `.section-reveal` when a chapter becomes active, and the CSS below
+   replays each one-shot reveal. Reduced motion: base.css collapses
+   durations; the rule at the bottom zeroes the stagger delays so everything
+   appears at once. */
+
+.chapter {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: calc(var(--space-6) + var(--space-5)) var(--pad-x) var(--space-8);
+  overflow: hidden;
+}
+
+/* ---- Content ---- */
+
+.chapter__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+}
+
+/* ---- Section color themes ----
+   ONE mechanism for the final contrast system: each chapter defines small
+   `--section-*` custom properties; every heading, supporting line, divider
+   and link color references them — no hardcoded text colors scattered in
+   the components. Dark art (charcoal wallpaper → warm ivory typography) is
+   the base; the three parchment sections override to charcoal typography.
+   Crimson accents are global and unchanged (`--crimson`). */
+
+.chapter {
+  --section-text-primary: var(--white-warm); /* headings / monograms */
+  --section-text-secondary: var(--parchment-soft); /* italic leads */
+  --section-text-support: var(--parchment-support); /* body / notes */
+  --section-text-shadow: var(--support-text-shadow);
+  --section-heading-shadow: none;
+  --section-border: rgba(232, 213, 181, 0.22);
+  --section-link-border: rgba(232, 213, 181, 0.35);
+}
+
+.chapter--path,
+.chapter--craft,
+.chapter--journey {
+  --section-text-primary: var(--charcoal);
+  --section-text-secondary: var(--charcoal-soft);
+  --section-text-support: var(--charcoal-soft);
+  /* Soft warm halo keeps charcoal ink legible over the parchment art's dark
+     brushwork — legibility only, never a glow. */
+  --section-text-shadow: 0 1px 10px rgba(255, 242, 222, 0.45);
+  --section-heading-shadow: 0 1px 10px rgba(255, 242, 222, 0.55);
+  --section-border: rgba(23, 22, 20, 0.16);
+  --section-link-border: rgba(23, 22, 20, 0.3);
+}
+
+.chapter__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Crimson editorial numeral markers — chapter / stage / project numbers.
+   Global refinement: set slightly larger (14px) so they read as clear
+   markers across ALL sections without ever dominating. Shared by every
+   chapter — no per-section duplication. */
+.chapter__index,
+.path__stage-index,
+.work__project-index {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+  color: var(--crimson);
+}
+
+.chapter__index {
+  margin: 0;
+}
+
+.chapter__title {
+  margin: 0;
+  font-size: var(--text-section);
+  color: var(--section-text-primary);
+  text-shadow: var(--section-heading-shadow, none);
+}
+
+/* ---- Entrance reveals (one-shot, no continuous decoration) ----
+   Gated on `[data-reveal]` so animations only play when the chapter is
+   entered (the director sets the attribute); never on mount below the fold. */
+
+.chapter[data-reveal] .chapter__index,
+.chapter[data-reveal] .chapter__title {
+  animation: chapter-reveal var(--dur-slow) var(--ease-out) backwards;
+}
+
+.chapter[data-reveal] .chapter__index {
+  animation-delay: 80ms;
+}
+
+@keyframes chapter-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- 02 — THE PATH ---- */
+
+.path__stages {
+  list-style: none;
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  max-width: 52rem;
+}
+
+.path__stage {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 var(--space-4);
+  align-items: start;
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--section-border);
+}
+
+.chapter[data-reveal] .path__stage {
+  animation: path-stage-reveal var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+.path__stage-index {
+  padding-top: var(--space-2);
+}
+
+.path__stage-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.625rem, 2.6vw, 2.5rem);
+  line-height: var(--lh-display);
+  color: var(--section-text-primary);
+  text-shadow: var(--section-heading-shadow, none);
+}
+
+.path__stage-text {
+  margin: var(--space-1) 0 0;
+  max-width: 38rem;
+  font-size: var(--text-body);
+}
+
+@keyframes path-stage-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Quiet closing line of milestones — titles only, no timeline furniture. */
+.path__milestones {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.chapter[data-reveal] .path__milestones {
+  animation: path-stage-reveal var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+.path__milestones-label {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+  color: var(--crimson);
+}
+
+.path__milestones-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.path__milestone {
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+}
+
+.path__milestone + .path__milestone::before {
+  content: "·";
+  margin-right: var(--space-3);
+  color: var(--crimson);
+}
+
+/* ---- 03 — THE CRAFT ----
+   Wallpaper (with its own strong ink brushwork) + editorial typography +
+   small restrained accents. The large foreground sumi-e stroke was removed
+   in PROMPT 12 as redundant against the new craft-ink.webp. */
+
+.craft__position {
+  margin: var(--space-5) 0 0;
+  max-width: 44rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+  line-height: var(--lh-display);
+}
+
+.chapter[data-reveal] .craft__position {
+  animation: chapter-reveal var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: 160ms;
+}
+
+.craft__group {
+  margin-top: var(--space-6);
+  max-width: 52rem;
+}
+
+.craft__group-label {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+  color: var(--crimson);
+}
+
+.chapter[data-reveal] .craft__group-label {
+  animation: chapter-reveal var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+.craft__terms {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-6);
+}
+
+.craft__term {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chapter[data-reveal] .craft__term {
+  animation: craft-term-reveal var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+.craft__term-name {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.5rem, 2.2vw, 2.25rem);
+  line-height: var(--lh-display);
+  color: var(--section-text-primary);
+  text-shadow: var(--section-heading-shadow, none);
+}
+
+.craft__term-note {
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  letter-spacing: 0.02em;
+}
+
+@keyframes craft-term-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- 04 — THE WORK ----
+   Projects as a curated editorial sequence — one block per project (number,
+   title, one-line tagline, description, stack, repository links), never a
+   card grid. Same quiet divider system as THE PATH. BVS is ONE project whose
+   links list has TWO repositories (smart contracts + frontend) — both render
+   as real semantic <a> elements from the content layer. */
+
+.work__list {
+  list-style: none;
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  max-width: 54rem;
+}
+
+.work__project {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 var(--space-4);
+  align-items: start;
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--section-border);
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.work__project:last-child {
+  border-bottom: 1px solid var(--section-border);
+}
+
+.chapter[data-reveal] .work__project {
+  animation: work-project-reveal var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+.work__project-index {
+  padding-top: var(--space-2);
+}
+
+.work__project-title {
+  margin: 0;
+  font-weight: 300;
+  font-size: var(--text-project);
+  line-height: 1.1;
+  color: var(--section-text-primary);
+  text-shadow: var(--section-heading-shadow, none);
+}
+
+.work__project-tagline {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.25rem, 1.75vw, 1.75rem);
+  line-height: var(--lh-display);
+}
+
+.work__project-description {
+  margin: var(--space-2) 0 0;
+  max-width: 40rem;
+  font-size: var(--text-body);
+}
+
+.work__project-note {
+  margin: var(--space-1) 0 0;
+  max-width: 40rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  letter-spacing: 0.02em;
+}
+
+.work__project-tech {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.work__project-tech li {
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  letter-spacing: 0.02em;
+}
+
+.work__project-tech li + li::before {
+  content: "·";
+  margin-right: var(--space-3);
+  color: var(--crimson);
+}
+
+.work__project-links {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.work__project-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--section-link-border);
+  color: var(--section-text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+  transition: background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.work__project-link:hover,
+.work__project-link:focus-visible {
+  background: var(--crimson);
+  border-color: var(--crimson);
+  color: var(--white-warm);
+}
+
+@keyframes work-project-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Focus engagement (PROMPT 09) ----
+   While a project is focused, the shared background quiets (opacity → 0.40,
+   blur → 4px, 650ms) and the OTHER projects recede to 0.55 (300ms). The
+   background compositor lives at App level, so a root-level `:has()` reaches
+   it from any focused project. Triggered by `:focus-within` — clicking or
+   tapping a real <a> focuses it, and keyboard focus is identical, so nothing
+   depends on hover (touch safe). Reduced motion collapses via base.css. */
+
+.background-stage {
+  opacity: 1;
+  filter: blur(0);
+  transition: opacity var(--dur-slow) var(--ease-out),
+    filter var(--dur-slow) var(--ease-out);
+}
+
+body:has(.chapter--work .work__project:focus-within) .background-stage {
+  opacity: var(--bg-focus-opacity);
+  filter: blur(var(--bg-focus-blur));
+}
+
+.chapter--work:has(.work__project:focus-within)
+  .work__project:not(:focus-within) {
+  opacity: 0.55;
+}
+
+/* ---- 05 — THE HUMAN ----
+   Editorially quiet: the statement lives on the left, ONE photograph in a
+   small 3:4 frame on the right — a print placed on parchment, not a gallery.
+   The photograph rotates through a single-photo slow loop (React state + CSS
+   opacity/translateX in TheHuman.tsx; ~1000ms transition, ~4500ms hold). The
+   frame is fixed-size (3:4) and photographs are CONTAINED inside it
+   object-fit: contain — native aspect preserved, never cropped or distorted;
+   letterboxing is parchment mat. Reduced motion: no loop, one stable photo. */
+
+.chapter--human .chapter__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 42%);
+  gap: var(--space-7) var(--space-6);
+  align-items: center;
+}
+
+.human__text {
+  grid-column: 1;
+}
+
+.human__lead {
+  margin: var(--space-5) 0 0;
+  max-width: 42rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.375rem, 2.2vw, 2rem);
+  line-height: var(--lh-display);
+}
+
+.chapter[data-reveal] .human__lead {
+  animation: chapter-reveal var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: 140ms;
+}
+
+/* The framed photograph — thin border, subtle mat inset, ~1.2° diagonal,
+   never a card (no radius, no shadow, no backdrop slab). The tilt lives in
+   `--frame-tilt` so the enter-reveal keyframes below can preserve it. */
+.human__stage {
+  --frame-tilt: 1.2deg;
+  position: relative;
+  grid-column: 2;
+  width: 100%;
+  max-width: 460px;
+  justify-self: center;
+  aspect-ratio: 3 / 4;
+  border: 1px solid rgba(241, 228, 204, 0.38);
+  transform: rotate(var(--frame-tilt));
+}
+
+/* Each photograph occupies the same frame slot; exactly one is visible.
+   The rotation is a crossfade with a whisper of lateral movement (12px) —
+   the photo is gently replaced, never slid like a carousel. */
+.human__photo {
+  position: absolute;
+  inset: var(--space-2);
+  margin: 0;
+  opacity: 0;
+  transform: translateX(12px);
+  pointer-events: none;
+  transition: opacity 1000ms var(--ease-out),
+    transform 1000ms var(--ease-out);
+}
+
+.human__photo--active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.human__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* On chapter enter the framed photograph rises as ONE object (the frame),
+   independent of the internal rotation crossfade. */
+.chapter[data-reveal] .human__stage {
+  animation: human-frame-reveal var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: 140ms;
+}
+
+@keyframes human-frame-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px) rotate(var(--frame-tilt, 0deg));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--frame-tilt, 0deg));
+  }
+}
+
+/* Interests row — same quiet editorial pattern as THE PATH milestones. */
+.human__interests {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.chapter[data-reveal] .human__interests {
+  animation: path-stage-reveal var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: 240ms;
+}
+
+.human__interests-label {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+  color: var(--crimson);
+}
+
+.human__interests-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.human__interest {
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+}
+
+.human__interest + .human__interest::before {
+  content: "·";
+  margin-right: var(--space-3);
+  color: var(--crimson);
+}
+
+.human__note {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  letter-spacing: 0.02em;
+}
+
+/* Tablet / mobile: stack text above the photograph. One image stays visible,
+   the rotation continues, the diagonal relaxes to a whisper. No overflow. */
+@media (max-width: 960px) {
+  .chapter--human .chapter__content {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+
+  .human__text {
+    grid-column: 1;
+  }
+
+  .human__stage {
+    grid-column: 1;
+    justify-self: center;
+    max-width: 420px;
+    --frame-tilt: 0.4deg;
+  }
+}
+
+/* ---- 06 — THE NEXT JOURNEY ----
+   Cinematic end credits: the flow slows to a centered closing scene —
+   chapter heading, one closing line, the AADI monogram, then the quiet social
+   links. No contact form, no CTA button. Semantic <a> links only (labels and
+   URLs from the content layer). */
+
+.chapter--journey .chapter__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.chapter[data-reveal] .journey__closing,
+.chapter[data-reveal] .journey__aadi,
+.chapter[data-reveal] .journey__links {
+  animation: journey-credit-reveal var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+.journey__closing {
+  margin: var(--space-6) 0 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.25rem, 2.2vw, 2rem);
+  line-height: var(--lh-display);
+}
+
+.journey__aadi {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--text-hero);
+  line-height: 1;
+  letter-spacing: var(--tracking-display);
+  color: var(--section-text-primary);
+  text-shadow: var(--section-heading-shadow, none);
+}
+
+.journey__links {
+  list-style: none;
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.journey__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-1) 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.journey__link:hover,
+.journey__link:focus-visible {
+  color: var(--crimson);
+}
+
+@keyframes journey-credit-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Global supporting-text refinement (all chapters) ----
+   One shared hierarchy driven by each section's theme tokens: italic
+   secondary leads and body/supporting text. Dark art uses the warm ivory
+   tiers (--parchment-soft / --parchment-support); the three parchment
+   sections use charcoal-soft. Applied to the shared roles so every section
+   inherits the same treatment without per-section color code. */
+
+.craft__position,
+.work__project-tagline,
+.human__lead,
+.journey__closing {
+  color: var(--section-text-secondary);
+  text-shadow: var(--section-text-shadow);
+}
+
+.path__stage-text,
+.path__milestone,
+.craft__term-note,
+.work__project-description,
+.work__project-note,
+.work__project-tech li,
+.human__interest,
+.human__note,
+.journey__link {
+  color: var(--section-text-support);
+  text-shadow: var(--section-text-shadow);
+}
+
+/* ---- Small screens: compact vertical rhythm ----
+   Typography stays on the shared clamp() scale; only spacing and the
+   editorial two-column rows relax so 320px stays comfortable. The index
+   numeral never wraps off the row — `auto` + wrap handles it. */
+@media (max-width: 760px) {
+  .chapter {
+    padding-top: calc(var(--space-5) + var(--space-4));
+    padding-bottom: var(--space-6);
+  }
+
+  .path__stages,
+  .work__list,
+  .craft__group {
+    margin-top: var(--space-5);
+  }
+
+  .path__stage,
+  .work__project {
+    gap: 0 var(--space-3);
+  }
+
+  .work__project {
+    padding-block: var(--space-4);
+  }
+}
+
+/* ---- Reduced motion: skip the cascade, show everything at once ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .chapter :is(
+      .chapter__index,
+      .chapter__title,
+      .path__stage,
+      .path__milestones,
+      .craft__position,
+      .craft__group-label,
+      .craft__term,
+      .work__project,
+      .human__lead,
+      .human__stage,
+      .human__interests,
+      .journey__closing,
+      .journey__aadi,
+      .journey__links
+    ) {
+    animation-delay: 0ms !important;
+  }
+}
