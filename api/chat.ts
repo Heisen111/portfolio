@@ -24,14 +24,37 @@ const json = (status: number, payload: Record<string, unknown>) =>
     headers: { "content-type": "application/json; charset=utf-8" },
   });
 
+/**
+ * Reads a request header across the two request shapes this handler sees:
+ *
+ *  - Fetch API `Headers` (the signature's declared type — used by Vitest and
+ *    the Vite dev middleware), and
+ *  - Vercel's Node/serverless runtime, which hands the function a request
+ *    whose `headers` is a plain object keyed by lowercase field names
+ *    (values may be strings or string arrays for repeated fields).
+ *
+ * Preferring `.get()` avoids case-folding surprises; the plain-object branch
+ * mirrors Node's `IncomingMessage.headers[field.toLowerCase()]` accessor.
+ */
+function getHeader(req: Request, name: string): string | null {
+  const headers = req.headers;
+  if (typeof (headers as Headers).get === "function") {
+    return headers.get(name);
+  }
+  const plain = headers as unknown as Record<string, string | string[] | undefined>;
+  const value = plain[name.toLowerCase()] ?? plain[name];
+  if (Array.isArray(value)) return value[0] ?? null;
+  return value ?? null;
+}
+
 /** Best-effort client identity from the proxy headers Vercel sets. */
 function clientIp(req: Request): string {
-  const forwarded = req.headers.get("x-forwarded-for");
+  const forwarded = getHeader(req, "x-forwarded-for");
   if (forwarded) {
     const first = forwarded.split(",")[0]?.trim();
     if (first) return first;
   }
-  const real = req.headers.get("x-real-ip");
+  const real = getHeader(req, "x-real-ip");
   return real || "local";
 }
 
@@ -47,12 +70,12 @@ export function createChatHandler(modelCall: ModelCall): (req: Request) => Promi
         return json(429, { error: "rate_limited" });
       }
 
-      const declaredLength = Number(req.headers.get("content-length") ?? "0");
+      const declaredLength = Number(getHeader(req, "content-length") ?? "0");
       if (declaredLength > 0 && isBodyOversized(declaredLength)) {
         return json(413, { error: "body_too_large" });
       }
 
-      if (!(req.headers.get("content-type") ?? "").includes("application/json")) {
+      if (!(getHeader(req, "content-type") ?? "").includes("application/json")) {
         return json(415, { error: "unsupported_media_type" });
       }
 

@@ -151,6 +151,88 @@ describe("POST /api/chat — rate limiting", () => {
   });
 });
 
+describe("POST /api/chat — Vercel Node-style request (plain-object headers)", () => {
+  // Vercel's Node/serverless runtime hands the function a request whose
+  // `headers` is a plain lowercase-keyed object (values may be strings or
+  // string arrays for repeated fields) rather than a Fetch `Headers` instance
+  // — the exact shape behind the production `req.headers.get is not a function`
+  // crash in clientIp().
+  function vercelRequest(
+    headers: Record<string, string | string[] | undefined>,
+    body = JSON.stringify({ question: "What is Loupe?" }),
+  ): Request {
+    return {
+      method: "POST",
+      headers: { "content-type": "application/json", ...headers },
+      text: async () => body,
+    } as unknown as Request;
+  }
+
+  it("rate-limits per client using x-forwarded-for from plain-object headers", async () => {
+    const { handler } = capturedHandler();
+    for (let i = 0; i < 5; i++) {
+      const response = await handler(
+        vercelRequest({ "x-forwarded-for": "203.0.113.70" }),
+      );
+      expect(response.status).toBe(200);
+    }
+    const sixth = await handler(vercelRequest({ "x-forwarded-for": "203.0.113.70" }));
+    expect(sixth.status).toBe(429);
+    expect(await bodyOf(sixth)).toEqual({ error: "rate_limited" });
+  });
+
+  it("treats different plain-header clients independently (no fallback to 'local')", async () => {
+    const { handler } = capturedHandler();
+    // 5 each from two different IPs: if clientIp collapsed everything to
+    // "local", the shared bucket would trip at request 6; correct parsing
+    // keeps every request inside each 5/min per-client window.
+    for (const ip of ["203.0.113.71", "203.0.113.72"]) {
+      for (let i = 0; i < 5; i++) {
+        const response = await handler(vercelRequest({ "x-forwarded-for": ip }));
+        expect(response.status).toBe(200);
+      }
+    }
+  });
+
+  it("falls back to x-real-ip from plain-object headers", async () => {
+    const { handler } = capturedHandler();
+    for (let i = 0; i < 5; i++) {
+      const response = await handler(
+        vercelRequest({ "x-real-ip": "203.0.113.73" }),
+      );
+      expect(response.status).toBe(200);
+    }
+    const sixth = await handler(
+      vercelRequest({ "x-real-ip": "203.0.113.73" }),
+    );
+    expect(sixth.status).toBe(429);
+  });
+
+  it("handles string-array header values (duplicate/repeated Node headers)", async () => {
+    const { handler } = capturedHandler();
+    const response = await handler(
+      vercelRequest({ "x-forwarded-for": ["203.0.113.74", "198.51.100.9"] }),
+    );
+    expect(response.status).toBe(200);
+  });
+
+  it("keeps body-size and content-type guards working with plain headers", async () => {
+    const { handler } = capturedHandler();
+    const oversize = await handler(
+      vercelRequest(
+        { "content-type": "application/json" },
+        JSON.stringify({ question: "x".repeat(3000) }),
+      ),
+    );
+    expect(oversize.status).toBe(413);
+
+    const badType = await handler(
+      vercelRequest({ "content-type": "text/plain" }, JSON.stringify({ question: "hi" })),
+    );
+    expect(badType.status).toBe(415);
+  });
+});
+
 describe("POST /api/chat — provider & configuration failures", () => {
   it("returns a safe 503 when the server configuration is incomplete", async () => {
     const handler = createChatHandler(async () => {
