@@ -13,10 +13,10 @@
  * No tools, no browsing, no function calling, no databases. The model receives
  * exactly [system instructions + portfolio context] + [visitor question].
  */
-import { createModelCall, sanitizePlainText, ServerConfigError, type ModelCall } from "./groq";
-import { buildSystemMessage, buildUserMessage } from "./prompt";
-import { validateQuestion, isBodyOversized } from "./validate";
-import { rateLimiter } from "./rate-limit";
+import { createModelCall, sanitizePlainText, ServerConfigError, type ModelCall } from "./groq.js";
+import { buildSystemMessage, buildUserMessage } from "./prompt.js";
+import { validateQuestion, isBodyOversized } from "./validate.js";
+import { rateLimiter } from "./rate-limit.js";
 
 const json = (status: number, payload: Record<string, unknown>) =>
   new Response(JSON.stringify(payload), {

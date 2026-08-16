@@ -1,5 +1,5 @@
-import { PORTFOLIO_CONTEXT } from "./context";
-import type { ChatMessage } from "./groq";
+import { PORTFOLIO_CONTEXT } from "./context.js";
+import type { ChatMessage } from "./groq.js";
 
 /**
  * Authoritative system instructions for the portfolio concierge. The visitor
