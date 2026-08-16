@@ -227,7 +227,7 @@
   line-height: calc(var(--lh-display) / var(--ja-scale));
   writing-mode: horizontal-tb;
   direction: ltr;
-  color: var(--crimson-bright);
+  color: var(--crimson);
   opacity: 0;
   pointer-events: none;
   user-select: none;

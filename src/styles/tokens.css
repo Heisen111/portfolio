@@ -12,10 +12,10 @@
   --charcoal-soft: #292723;
   --crimson: #a32b30;
   --crimson-dark: #68181c;
-  /* Crimson that clears WCAG on the dark hero (~4.7:1 on #171614) — used
+  /* Crimson that clears WCAG on the dark hero (~4.66:1 on #171614) — used
      only where crimson text must stay readable over artwork (the hero's
      Japanese quote). Accents/links on parchment keep --crimson. */
-  --crimson-bright: #d45a61;
+  --crimson-bright: #ea4350;
   --mist: rgba(232, 213, 181, 0.65);
   --white-warm: #f5ebdd;
 
