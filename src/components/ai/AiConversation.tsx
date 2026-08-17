@@ -83,9 +83,12 @@ export default function AiConversation() {
     void ask(label);
   };
 
-  // Keep the newest exchange in view once an answer lands.
+  // Keep the newest exchange in view once an answer lands. Only runs when
+  // there is an exchange beyond the opening greeting — the initial mount must
+  // never scroll the page (that would yank the visitor to the panel the first
+  // time they reach THE NEXT JOURNEY instead of stopping at the section head).
   useEffect(() => {
-    if (pending) return;
+    if (pending || exchanges.length <= 1) return;
     inputRef.current?.scrollIntoView({
       behavior: reduced ? "auto" : "smooth",
       block: "nearest",

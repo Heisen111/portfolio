@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { sectionRefs } from "./lib/navigation";
 import Arrival from "./components/sections/Arrival";
 import BackgroundStage from "./components/media/BackgroundStage";
@@ -9,6 +9,7 @@ import ThePath from "./components/sections/ThePath";
 import TheWork from "./components/sections/TheWork";
 import ExperienceIntro from "./components/intro/ExperienceIntro";
 import Navbar from "./components/navigation/Navbar";
+import { useContentMask } from "./hooks/useContentMask";
 import { useActiveSection } from "./hooks/useActiveSection";
 import { useSectionTransitions } from "./hooks/useSectionTransitions";
 
@@ -52,6 +53,9 @@ export default function App() {
     setHeroActive(true);
     markExperienceIntroSeen();
   }, []);
+  // Anchors the navbar-recede mask (see useContentMask + chapters.css).
+  const contentMaskRef = useRef<HTMLDivElement | null>(null);
+  useContentMask(contentMaskRef);
 
   const activeRef = useActiveSection(sectionRefs);
   useSectionTransitions(sectionRefs, activeRef);
@@ -68,11 +72,13 @@ export default function App() {
       <BackgroundStage sectionRefs={sectionRefs} activeRef={activeRef} />
       <main id="main">
         <Arrival start={heroActive} />
-        <ThePath />
-        <TheCraft />
-        <TheWork />
-        <TheHuman />
-        <TheNextJourney />
+        <div className="content-mask" ref={contentMaskRef}>
+          <ThePath />
+          <TheCraft />
+          <TheWork />
+          <TheHuman />
+          <TheNextJourney />
+        </div>
       </main>
     </>
   );

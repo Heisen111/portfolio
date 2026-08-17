@@ -8,6 +8,34 @@
    durations; the rule at the bottom zeroes the stagger delays so everything
    appears at once. */
 
+/* ---- Navbar recede mask ----
+   Content that passes under the floating nav fades out smoothly, exactly
+   like it's receding past the frame — no element logic, no hard cutoff, and
+   a text block or photo stopped half-under the nav stays whole below it.
+   The band is glued to the viewport top by `--scroll-y` − `--content-top`
+   (written by hooks/useContentMask.ts per masked element), so it always sits
+   under the nav regardless of scroll. Media layers — BackgroundStage artwork
+   and the hero's video stack — never carry this mask, so they stay 100%
+   visible at all times. Reduced motion: a mask is zero motion, so the effect
+   simply stays (content under the nav is hidden, as in any film frame). */
+
+.content-mask {
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0,
+    transparent calc(var(--scroll-y) - var(--content-top) + 64px),
+    black calc(var(--scroll-y) - var(--content-top) + 128px),
+    black 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0,
+    transparent calc(var(--scroll-y) - var(--content-top) + 64px),
+    black calc(var(--scroll-y) - var(--content-top) + 128px),
+    black 100%
+  );
+}
+
 .chapter {
   position: relative;
   min-height: 100vh;
