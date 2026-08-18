@@ -49,12 +49,14 @@ export default function Arrival({ start = true }: { start?: boolean }) {
             </figcaption>
           </figure>
         </div>
-
-        <p className="hero__scroll" aria-hidden="true">
-          <span className="hero__scroll-label">{heroCopy.scrollCue}</span>
-          <span className="hero__scroll-line" aria-hidden="true" />
-        </p>
       </div>
+
+      {/* Decorative scroll cue lives OUTSIDE the content mask — it sits in the
+          hero's bottom padding, never near the navbar, and must stay whole. */}
+      <p className="hero__scroll" aria-hidden="true">
+        <span className="hero__scroll-label">{heroCopy.scrollCue}</span>
+        <span className="hero__scroll-line" aria-hidden="true" />
+      </p>
     </section>
   );
 }
